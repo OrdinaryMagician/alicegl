@@ -1,0 +1,10 @@
+#!/bin/sh
+source ./.aosbuild
+
+aos_compiler ${CC:-clang}
+aos_cflags -march=native -std=c99 -Os -pipe -Wall -Wextra -Werror -pedantic
+aos_lflags $CFLAGS -shared -ldl
+aos_bin libaglext.so
+aos_src libaglext/*.c
+
+aos_main $@
