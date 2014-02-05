@@ -26,12 +26,12 @@ Backend:
       - Vertex shader
       - Geometry shader
       - Fragment shader
-    - Render pipeline
-      - Rasterizer
-        - Vertex processing
-        - Fragment processing
-      - Trigger
-        - Multithreaded queueing
+  - Render pipeline
+    - Rasterizer
+      - Vertex processing
+      - Fragment processing
+    - Trigger
+      - Multithreaded queueing
 
 Frontend:
   X Start project
@@ -118,7 +118,7 @@ Frontend:
       - aglDeleteVBO()
       - aglUseVBO()
       - aglCreateFBO()
-      - aglFBOOption()
+      - aglFBOData()
       - aglDeleteFBO()
       - aglUseFBO()
       - aglCreateProgram()
