@@ -4,7 +4,7 @@ source ./.aosbuild
 aos_compiler ${CC:-clang}
 aos_cflags -march=native -std=c99 -Os -pipe -Wall -Wextra -Werror -pedantic
 aos_lflags $CFLAGS -shared -ldl
-aos_bin libaglext.so
-aos_src libaglext/*.c
+aos_bin libagl.so
+aos_src src/*.c
 
 aos_main $@
