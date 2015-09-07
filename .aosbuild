@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2013 UnSX Team
+# Copyright (c) 2013-2015 UnSX Team
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -57,12 +57,12 @@ function aos_pkg()
 {
 	for pkg in "$@"
 	do
-		! pkg-config --exists "$pkg" &&
+		! "${PKGCONF}" --exists "$pkg" &&
 		aos_rmsg "AOS" "Package \"$pkg\" not found" &&
 		exit 1
-		aos_cflags $(pkg-config --cflags "$pkg")
-		aos_lflags $(pkg-config --libs "$pkg")
 	done
+	aos_cflags $("${PKGCONF}" --cflags $@)
+	aos_lflags $("${PKGCONF}" --libs $@)
 }
 
 # set compiler
@@ -82,6 +82,16 @@ function aos_linker()
 	aos_rmsg "AOS" "Linker \"$1\" not found" &&
 	exit 1
 	LN="$1"
+}
+
+# set pkgconfig
+function aos_pkgconfig()
+{
+	! which "$1" >/dev/null &&
+	aos_rmsg "AOS" "pkg-config \"$1\" not found" &&
+	exit 1
+	PKGCONF="$1"
+
 }
 
 # set resulting binary
@@ -135,7 +145,7 @@ function aos_link()
 {
 	aos_binchk && return
 	aos_gmsg "CC" "$BIN"
-	$CC ${LFLAGS[@]} -o "$BIN" ${SRCO[@]} && return
+	$CC -o "$BIN" ${SRCO[@]} ${LFLAGS[@]} && return
 	aos_rmsg "AOS" "Errors occured when linking"
 	exit 1
 }

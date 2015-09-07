@@ -1,0 +1,82 @@
+Legend:
+- To do
+X Done
+P Partial
+F Failed
+C Currently in progress
+
+Base project (AliceGL - Graphics Library):
+  X Start project
+  X Figure out how to do this damn thing
+  C Base skeleton
+  - Context object
+    - Render state
+      - Render parameters
+      - Active resources
+      - Geometry queue
+    - Resource table
+      - Samplers
+      - Buffers
+      - Arrays
+  - Rasterizer
+    - Triangle drawing
+      - Point
+      - Line
+      - Triangle
+      - Interpolation/Smoothing
+      - Depth testing
+      - Blending
+      - Antialiasing
+    - Transform programs (a.k.a. shaders)
+      - Vertex transform (vertex shader)
+      - Fragment transform (fragment shader)
+      - Buffer transform (screen shader)
+  - API
+    - Meta
+      - aglInit
+      - aglQuit
+    - Geometry queue
+      - aglStartQueue
+      - aglPushVertex
+      - aglPushNormal
+      - aglPushCoord
+      - aglPushColor
+      - aglDrawQueue
+    - Draw arrays
+      - aglMakeArray
+      - aglDrawArray
+      - aglDeleteArray
+    - Sampler management
+      - aglMakeSampler
+      - aglDeleteSampler
+    - Buffers
+      - aglMakeBuffer
+      - aglDeleteBuffer
+    - Texture utility functions
+      - aglTex2D
+      - aglTex3D
+      - aglGetPixel
+      - aglPutPixel
+Math suite (AliceGL - Geometry Library):
+  - Start project
+  - Vector
+    - Basic math
+    - Advanced math
+  - Matrix
+    - Basic math
+    - Advanced math
+Helper stuff (AliceGL - Game Library):
+  - Start project
+  - Geometry generator
+    - Plane
+    - Polyhedra
+    - Sphere
+    - Teapot
+  - Collision detection
+    - Sphere
+    - Triangle
+    - Box
+  - Tracers
+  - Physics helpers
+  - Skeletal animation
+  - Etc.
