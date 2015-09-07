@@ -38,11 +38,11 @@ just queue up data bit by bit, then "end" the whole thing. However unlike in
 OpenGL, you can queue up all the data then repeat the final draw multiple
 times. There's just one queue, and due to the low-level design of this
 library, you have to give it a maximum capacity yourself when initializing
-it.
+it, along with allocating its memory.
  - The second is pretty much like modern VBOs. You build the array of all
 geometry data, then call aglMakeArray() with it. Note that since there's no
 memory separation here, the data you passed will be used directly, so don't
-free it. With the array created, you can jut call aglDrawArray() with whatever
+free it. With the array created, you can just call aglDrawArray() with whatever
 array you want to draw, anytime. Oh, and if you want you can modify the
 contents of said array, if you know its internal structure, just don't free the
 data yourself.
