@@ -74,4 +74,5 @@ game-specific functionality, like physics and animation.
 
 ## Okay whatever... so... is it going to be FOSS?
 
-Of course! And obviously under the nice permissive MIT license I like so much.
+Of course! And obviously under the ~~nice permissive MIT license I like so
+much~~ GNU LGPL v3, because I think MIT won't really fit here.
