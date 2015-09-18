@@ -24,9 +24,12 @@ Base project (AliceGL - Graphics Library):
       - Line
       - Triangle
       - Interpolation/Smoothing
+      - Culling
+      - Masking
       - Depth testing
       - Blending
       - Antialiasing
+      - Stencil testing
     - Transform programs (a.k.a. shaders)
       - Vertex transform (vertex shader)
       - Fragment transform (fragment shader)

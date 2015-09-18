@@ -12,8 +12,6 @@
 static void agl_loaded( void ) __attribute__((constructor));
 static void agl_unloaded( void ) __attribute__((destructor));
 
-/* WHOOOAAAAA, LOOK AT ALL THESE PLACEHOLDERS */
-
 static void agl_loaded( void )
 {
 }
@@ -121,5 +119,3 @@ void aglPutPixel( aglBuffer* buf, unsigned x, unsigned y, void* from )
 {
 	(void)buf, (void)x, (void)y, (void)from;
 }
-
-/* I'll work on it eventually */

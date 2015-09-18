@@ -4,10 +4,12 @@
 	Released under the GNU Lesser General Public License (version 3).
 */
 
-#define BUF_HASALPHA 0x01
-#define BUF_FLOATCOL 0x02
-#define BUF_USEDEPTH 0x04
-#define BUF_INTDEPTH 0x08
+#define BUF_HASALPHA   0x01
+#define BUF_FLOATCOL   0x02
+#define BUF_USEDEPTH   0x04
+#define BUF_INTDEPTH   0x08
+#define BUF_USESTENCIL 0x10
+#define BUF_INTSTENCIL 0x20
 
 #define ARR_VERTICES 0x01
 #define ARR_NORMALS  0x02
@@ -39,6 +41,35 @@
 #define CUBE_PZ 0x04
 #define CUBE_NZ 0x05
 
+#define TEST_NEVER    0x00
+#define TEST_LESS     0x01
+#define TEST_LEQUAL   0x02
+#define TEST_EQUAL    0x03
+#define TEST_GEQUAL   0x04
+#define TEST_GREATER  0x05
+#define TEST_ALWAYS   0x06
+#define TEST_NOTEQUAL 0x07
+
+#define ST_KEEP 0x00
+#define ST_ZERO 0x01
+#define ST_INC  0x02
+#define ST_DEC  0x03
+#define ST_INV  0x04
+#define ST_REPL 0x05
+#define ST_INCW 0x06
+#define ST_DECW 0x07
+
+#define CL_BACK  0x00
+#define CL_FRONT 0x01
+#define CL_BOTH  0x02
+
+#define BLEND_ONE   0x00
+#define BLEND_ADD   0x01
+#define BLEND_MULT  0x02
+#define BLEND_OVER  0x03
+#define BLEND_MOD   0x04
+#define BLEND_ALPHA 0x10
+
 /* a sampler */
 typedef struct aglsmp
 {
@@ -56,9 +87,16 @@ typedef struct aglsmp
 typedef struct aglbuf
 {
 	struct aglbuf *prev, *next;
-	void *color, *depth;
+	void *color, *depth, *stencil;
 	unsigned width, height;
 	unsigned char flags;
+	unsigned char redmask:1;
+	unsigned char greenmask:1;
+	unsigned char bluemask:1;
+	unsigned char alphamask:1;
+	unsigned char depthmask:1;
+	unsigned char unusedmask:3;
+	unsigned int stencilmask;
 } aglBuffer;
 /* an array */
 typedef struct aglarr
@@ -84,9 +122,12 @@ typedef struct aglctx
 {
 	aglBuffer *target;
 	aglSampler *activetex[8];
+	float scissor[4];
 	unsigned char depthtest;
-	unsigned char blendsrc;
-	unsigned char blenddest;
+	unsigned char stenciltest;
+	unsigned char stencilop[3];
+	unsigned char cullface;
+	unsigned char blendmode;
 	float *queue;
 	unsigned queuesize, queuepos;
 	unsigned char queueflags;
