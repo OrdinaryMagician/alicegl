@@ -90,12 +90,16 @@ typedef struct aglbuf
 	void *color, *depth, *stencil;
 	unsigned width, height;
 	unsigned char flags;
-	unsigned char redmask:1;
-	unsigned char greenmask:1;
-	unsigned char bluemask:1;
-	unsigned char alphamask:1;
-	unsigned char depthmask:1;
-	unsigned char unusedmask:3;
+	union
+	{
+		unsigned char redmask:1;
+		unsigned char greenmask:1;
+		unsigned char bluemask:1;
+		unsigned char alphamask:1;
+		unsigned char depthmask:1;
+		unsigned char unusedmask:3;
+		unsigned char coldepmasks;
+	};
 	unsigned int stencilmask;
 } aglBuffer;
 /* an array */
@@ -132,7 +136,7 @@ typedef struct aglctx
 	unsigned queuesize, queuepos;
 	unsigned char queueflags;
 	aglSampler *samplers;
-	aglArray *arrags;
+	aglArray *arrays;
 	aglBuffer *buffers;
 	aglProgdata pdata;
 	void (*vertexprog)(struct aglctx* ctx);
@@ -141,7 +145,7 @@ typedef struct aglctx
 } aglContext;
 
 /* initialize a context (allocates struct and sets defaults */
-void aglInit( aglContext* ctx );
+aglContext* aglInit( void );
 /* destroy a context (clears resources then frees context) */
 void aglQuit( aglContext* ctx );
 

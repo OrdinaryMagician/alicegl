@@ -5,6 +5,8 @@
 */
 
 #include "agl.h"
+#include <stdlib.h>
+#include <string.h>
 
 /* prototypes */
 
@@ -20,19 +22,59 @@ static void agl_unloaded( void )
 {
 }
 
-void aglInit( aglContext* ctx )
+/* creates a new, zero-filled context object */
+aglContext* aglInit( void )
 {
-	(void)ctx;
+	aglContext *ctx = malloc(sizeof(aglContext));
+	memset(ctx,0,sizeof(aglContext));
+	return ctx;
 }
 
+/* frees the context object along with all the data associated with it */
 void aglQuit( aglContext* ctx )
 {
-	(void)ctx;
+	if ( ctx->queue ) free(ctx->queue);
+	if ( ctx->samplers )
+	{
+		aglSampler *s = ctx->samplers, *n;
+		do
+		{
+			n = s->next;
+			aglDeleteSampler(ctx,s);
+			s = n;
+		} while ( n );
+	}
+	if ( ctx->arrays )
+	{
+		aglArray *s = ctx->arrays, *n;
+		do
+		{
+			n = s->next;
+			aglDeleteArray(ctx,s);
+			s = n;
+		} while ( n );
+	}
+	if ( ctx->buffers )
+	{
+		aglBuffer *s = ctx->buffers, *n;
+		do
+		{
+			n = s->next;
+			aglDeleteBuffer(ctx,s);
+			s = n;
+		} while ( n );
+	}
+	free(ctx);
 }
 
+/* begins a new queue */
 void aglStartQueue( aglContext* ctx, unsigned flags )
 {
-	(void)ctx, (void)flags;
+	if ( !ctx->queue )
+		ctx->queue = malloc(sizeof(float)*(ctx->queuesize=256));
+	ctx->queuepos = 0;
+	ctx->queueflags = flags;
+	// left here
 }
 
 void aglPushVertex( aglContext* ctx, float x, float y, float z )
@@ -74,30 +116,64 @@ void aglDrawArray( aglContext* ctx, aglArray* arr )
 
 void aglDeleteArray( aglContext* ctx, aglArray* arr )
 {
-	(void)ctx, (void)arr;
+	if ( arr == ctx->arrays ) ctx->arrays = arr->next;
+	if ( arr->prev ) arr->prev->next = arr->next;
+	if ( arr->next ) arr->next->prev = arr->prev;
+	if ( arr->data ) free(arr->data);
+	free(arr);
 }
 
 aglSampler* aglMakeSampler( aglContext* ctx, unsigned nbytes, void* data )
 {
-	(void)ctx, (void)nbytes, (void)data;
-	return 0;
+	aglSampler *smp = malloc(sizeof(aglSampler));
+	memset(smp,0,sizeof(aglSampler));
+	if ( nbytes ) smp->data = malloc(nbytes);
+	if ( data ) memcpy(smp->data,data,nbytes);
+	aglSampler *s;
+	smp->next = s = ctx->samplers;
+	return (s->prev = smp);
 }
 
 void aglDeleteSampler( aglContext* ctx, aglSampler* smp )
 {
-	(void)ctx, (void)smp;
+	if ( smp == ctx->samplers ) ctx->samplers = smp->next;
+	if ( smp->prev ) smp->prev->next = smp->next;
+	if ( smp->next ) smp->next->prev = smp->prev;
+	if ( smp->data ) free(smp->data);
+	free(smp);
 }
 
 aglBuffer* aglMakeBuffer( aglContext* ctx, unsigned w, unsigned h,
 	unsigned flags )
 {
-	(void)ctx, (void)w, (void)h, (void)flags;
-	return 0;
+	aglBuffer *buf = malloc(sizeof(aglBuffer));
+	memset(buf,0,sizeof(aglBuffer));
+	buf->flags = flags;
+	buf->width = w;
+	buf->height = h;
+	unsigned pxsiz = ((flags&BUF_FLOATCOL)?sizeof(float):sizeof(char))
+		*((flags&BUF_HASALPHA)?4:3);
+	buf->color = malloc(w*h*pxsiz);
+	pxsiz = (flags&BUF_INTDEPTH)?sizeof(unsigned):sizeof(float);
+	if ( flags&BUF_USEDEPTH ) buf->depth = malloc(w*h*pxsiz);
+	pxsiz = (flags&BUF_INTSTENCIL)?sizeof(unsigned):1;
+	if ( flags&BUF_USESTENCIL ) buf->stencil = malloc(w*h*pxsiz);
+	buf->coldepmasks = -1;
+	buf->stencilmask = -1;
+	aglBuffer *s;
+	buf->next = s = ctx->buffers;
+	return (s->prev = buf);
 }
 
 void aglDeleteBuffer( aglContext* ctx, aglBuffer* buf )
 {
-	(void)ctx, (void)buf;
+	if ( buf == ctx->buffers ) ctx->buffers = buf->next;
+	if ( buf->prev ) buf->prev->next = buf->next;
+	if ( buf->next ) buf->next->prev = buf->prev;
+	if ( buf->color ) free(buf->color);
+	if ( buf->depth ) free(buf->depth);
+	if ( buf->stencil ) free(buf->stencil);
+	free(buf);
 }
 
 void aglTex2D( aglSampler* smp, float u, float v, void* to )

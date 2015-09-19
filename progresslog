@@ -8,16 +8,8 @@ C Currently in progress
 Base project (AliceGL - Graphics Library):
   X Start project
   X Figure out how to do this damn thing
-  C Base skeleton
-  - Context object
-    - Render state
-      - Render parameters
-      - Active resources
-      - Geometry queue
-    - Resource table
-      - Samplers
-      - Buffers
-      - Arrays
+  X Base skeleton
+  X Context object
   - Rasterizer
     - Triangle drawing
       - Point
@@ -34,27 +26,27 @@ Base project (AliceGL - Graphics Library):
       - Vertex transform (vertex shader)
       - Fragment transform (fragment shader)
       - Buffer transform (screen shader)
-  - API
-    - Meta
-      - aglInit
-      - aglQuit
-    - Geometry queue
-      - aglStartQueue
+  C API
+    X Meta
+      X aglInit
+      X aglQuit
+    C Geometry queue
+      C aglStartQueue
       - aglPushVertex
       - aglPushNormal
       - aglPushCoord
       - aglPushColor
       - aglDrawQueue
-    - Draw arrays
+    P Draw arrays
       - aglMakeArray
       - aglDrawArray
-      - aglDeleteArray
-    - Sampler management
-      - aglMakeSampler
-      - aglDeleteSampler
-    - Buffers
-      - aglMakeBuffer
-      - aglDeleteBuffer
+      X aglDeleteArray
+    X Sampler management
+      X aglMakeSampler
+      X aglDeleteSampler
+    X Buffers
+      X aglMakeBuffer
+      X aglDeleteBuffer
     - Texture utility functions
       - aglTex2D
       - aglTex3D
