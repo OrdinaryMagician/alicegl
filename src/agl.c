@@ -123,12 +123,11 @@ void aglDeleteArray( aglContext* ctx, aglArray* arr )
 	free(arr);
 }
 
-aglSampler* aglMakeSampler( aglContext* ctx, unsigned nbytes, void* data )
+aglSampler* aglMakeSampler( aglContext* ctx, void* data )
 {
 	aglSampler *smp = malloc(sizeof(aglSampler));
 	memset(smp,0,sizeof(aglSampler));
-	if ( nbytes ) smp->data = malloc(nbytes);
-	if ( data ) memcpy(smp->data,data,nbytes);
+	smp->data = data;
 	aglSampler *s;
 	smp->next = s = ctx->samplers;
 	return (s->prev = smp);

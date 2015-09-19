@@ -167,7 +167,7 @@ void aglDrawArray( aglContext* ctx, aglArray* arr );
 void aglDeleteArray( aglContext* ctx, aglArray* arr );
 
 /* samplers are a fancy way of calling textures */
-aglSampler* aglMakeSampler( aglContext* ctx, unsigned nbytes, void* data );
+aglSampler* aglMakeSampler( aglContext* ctx, void* data );
 void aglDeleteSampler( aglContext* ctx, aglSampler* smp );
 
 /* buffers are render targets, opengl calls them frame buffer objects  */
