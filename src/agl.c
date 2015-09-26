@@ -255,7 +255,7 @@ int aglDeleteBuffer( aglContext* ctx, aglBuffer* buf )
 
 int aglShadeBuffer( aglContext* ctx, aglBuffer* buf, int (*prog)(aglContext*) )
 {
-	(void)smp, (void)buf, (void)prog;
+	(void)ctx, (void)buf, (void)prog;
 	return error(M_UNIMP);
 }
 
