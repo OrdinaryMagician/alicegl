@@ -31,11 +31,11 @@ Base project (AliceGL - Graphics Library):
       X aglInit
       X aglQuit
     C Geometry queue
-      C aglStartQueue
-      - aglPushVertex
-      - aglPushNormal
-      - aglPushCoord
-      - aglPushColor
+      X aglStartQueue
+      X aglPushVertex
+      C aglPushNormal
+      C aglPushCoord
+      C aglPushColor
       - aglDrawQueue
     P Draw arrays
       - aglMakeArray

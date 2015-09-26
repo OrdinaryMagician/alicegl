@@ -144,40 +144,47 @@ typedef struct aglctx
 	void (*bufferprog)(struct aglctx* ctx);
 } aglContext;
 
+/* a pixel, used for getpixel/putpixel calls */
+typedef struct aglpx
+{
+	float r, g, b, a, d;
+	unsigned s;
+} aglPixel;
+
 /* initialize a context (allocates struct and sets defaults */
 aglContext* aglInit( void );
 /* destroy a context (clears resources then frees context) */
-void aglQuit( aglContext* ctx );
+int aglQuit( aglContext* ctx );
 
 /* start up the geometry queue (clears any existing data) */
-void aglStartQueue( aglContext* ctx, unsigned flags );
+int aglStartQueue( aglContext* ctx, unsigned siz, unsigned flags );
 /* push various elements to the queue (make sure you follow the order) */
-void aglPushVertex( aglContext* ctx, float x, float y, float z );
-void aglPushNormal( aglContext* ctx, float x, float y, float z );
-void aglPushCoord( aglContext* ctx, float u, float v );
-void aglPushColor( aglContext* ctx, float r, float g, float b );
+int aglPushVertex( aglContext* ctx, float x, float y, float z );
+int aglPushNormal( aglContext* ctx, float x, float y, float z );
+int aglPushCoord( aglContext* ctx, float u, float v );
+int aglPushColor( aglContext* ctx, float r, float g, float b );
 /* rasterize all the things! */
-void aglDrawQueue( aglContext* ctx );
+int aglDrawQueue( aglContext* ctx );
 /* note that alicegl only knows triangles. no strips, fans, or any others */
 
 /* draw arrays are simpler and faster (for alicegl, not for you!) */
 aglArray* aglMakeArray( aglContext* ctx, unsigned ntris, unsigned flags,
 	void* data );
-void aglDrawArray( aglContext* ctx, aglArray* arr );
-void aglDeleteArray( aglContext* ctx, aglArray* arr );
+int aglDrawArray( aglContext* ctx, aglArray* arr );
+int aglDeleteArray( aglContext* ctx, aglArray* arr );
 
 /* samplers are a fancy way of calling textures */
 aglSampler* aglMakeSampler( aglContext* ctx, void* data );
-void aglDeleteSampler( aglContext* ctx, aglSampler* smp );
+int aglDeleteSampler( aglContext* ctx, aglSampler* smp );
 
 /* buffers are render targets, opengl calls them frame buffer objects  */
 aglBuffer* aglMakeBuffer( aglContext* ctx, unsigned w, unsigned h,
 	unsigned flags );
-void aglDeleteBuffer( aglContext* ctx, aglBuffer* buf );
+int aglDeleteBuffer( aglContext* ctx, aglBuffer* buf );
 
 /* texture sampling functions */
 
-void aglTex2D( aglSampler* smp, float u, float v, void* to );
-void aglTex3D( aglSampler* smp, float u, float v, float w, void *to );
-void aglGetPixel( aglBuffer* buf, unsigned x, unsigned y, void* to );
-void aglPutPixel( aglBuffer* buf, unsigned x, unsigned y, void* from );
+int aglTex2D( aglSampler* smp, float u, float v, aglPixel* to );
+int aglTex3D( aglSampler* smp, float u, float v, float w, aglPixel* to );
+int aglGetPixel( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to );
+int aglPutPixel( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from );
