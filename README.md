@@ -79,42 +79,42 @@ slightly wrong or terribly wrong ("warnings" or "errors"). Using a format
 similar to ALSA's libraries to know where in the code stuff is happening, the
 current messages and their explanations are the following:
 
-- *Null pointer returned from malloc (out of memory?)*: means what it says, a
+- **Null pointer returned from malloc (out of memory?)**: means what it says, a
   call to malloc() returned a null pointer, this could usually mean you ran
   out of memory, somehow.
-- *Oh gn0! I am teh suck!*: You're passing a nonexistent context to API calls,
+- **Oh gn0! I am teh suck!**: You're passing a nonexistent context to API calls,
   you doofus.
-- *There was an object here, but it's gone now*: Deleting an object that
+- **There was an object here, but it's gone now**: Deleting an object that
   doesn't exist, trying to draw a nonexistent array or pushing to an
   unallocated queue.
-- *Attempted to start queue with zero size*: You can guess what this means.
-- *No space left in queue to push data*: You're pushing more data than the
+- **Attempted to start queue with zero size**: You can guess what this means.
+- **No space left in queue to push data**: You're pushing more data than the
   queue can handle. Fix this by setting a big enough capacity and reallocating
   the queue.
-- *Call to aglDrawQueue with no data*: Nothing to draw, obviously.
-- *Premature end to queue (bad flags?)*: This usually happens if you're not
+- **Call to aglDrawQueue with no data**: Nothing to draw, obviously.
+- **Premature end to queue (bad flags?)**: This usually happens if you're not
   pushing all required data to the queue. The kind of issue the library itself
   can easily detect. If you push things in the wrong order, you're usually the
   one who can detect it, with your own eyes, being stabbed with glitched
   triangles. In the future I'll try to find a way to prevent this from actually
   happening, by keeping track of what type of element needs to be pushed every
   time.
-- *Cannot push data with current flags*: The queue flags don't allow for the
+- **Cannot push data with current flags**: The queue flags don't allow for the
   type of data you're pushing.
-- *AGL will now attempt to fit a square peg in a round hole*: You're either
+- **AGL will now attempt to fit a square peg in a round hole**: You're either
   accessing a 2D sampler with aglTex3D or a 3D sampler with aglTex2D. The
   value returned will be "mostly" correct for each situation, though.
-- *No data has been passed to API call*: This will happen when creating arrays
+- **No data has been passed to API call**: This will happen when creating arrays
   or samplers. It won't prevent the creation of either object, but just let you
   know that bad things will happen if you do NOT set actual data before using
   them.
-- *Element has no data to read*: The companion to the previous warning. The
+- **Element has no data to read**: The companion to the previous warning. The
   library is attempting to read from an object with no assigned data. It will
   default to some predefined fallback value in such a case.
-- *No vertices to see here*: You forgot to set the ARR_VERTICES flag on either
+- **No vertices to see here**: You forgot to set the ARR_VERTICES flag on either
   the queue or an array. This will easily happen if you're drawing from an
   uninitialized queue/array.
-- *Function not implemented*: You're using something that isn't done yet. This
+- **Function not implemented**: You're using something that isn't done yet. This
   will show up A LOT before the project is 100% complete.
 
 ## Okay whatever... so... is it going to be FOSS?
