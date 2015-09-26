@@ -47,6 +47,8 @@ Base project (AliceGL - Graphics Library):
     X Buffers
       X aglMakeBuffer
       X aglDeleteBuffer
+      - aglShadeBuffer
+      - aglClearBuffer
     - Texture utility functions
       - aglTex2D
       - aglTex3D

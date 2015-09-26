@@ -253,6 +253,18 @@ int aglDeleteBuffer( aglContext* ctx, aglBuffer* buf )
 	return 0;
 }
 
+int aglShadeBuffer( aglContext* ctx, aglBuffer* buf, int (*prog)(aglContext*) )
+{
+	(void)smp, (void)buf, (void)prog;
+	return error(M_UNIMP);
+}
+
+int aglClearBuffer( aglBuffer* buf, unsigned what )
+{
+	(void)buf, (void)what;
+	return error(M_UNIMP);
+}
+
 int aglTex2D( aglSampler* smp, float u, float v, aglPixel* to )
 {
 	(void)smp, (void)u, (void)v, (void)to;

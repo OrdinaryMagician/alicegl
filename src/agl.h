@@ -11,6 +11,10 @@
 #define BUF_USESTENCIL 0x10
 #define BUF_INTSTENCIL 0x20
 
+#define CLEAR_COLOR   0x01
+#define CLEAR_DEPTH   0x02
+#define CLEAR_STENCIL 0x04
+
 #define ARR_VERTICES 0x01
 #define ARR_NORMALS  0x02
 #define ARR_COORDS   0x04
@@ -100,7 +104,9 @@ typedef struct aglbuf
 		unsigned char unusedmask:3;
 		unsigned char coldepmasks;
 	};
-	unsigned int stencilmask;
+	unsigned stencilmask;
+	float clearcolor, cleardepth;
+	unsigned clearstencil;
 } aglBuffer;
 /* an array */
 typedef struct aglarr
@@ -139,9 +145,8 @@ typedef struct aglctx
 	aglArray *arrays;
 	aglBuffer *buffers;
 	aglProgdata pdata;
-	void (*vertexprog)(struct aglctx* ctx);
-	void (*fragmentprog)(struct aglctx* ctx);
-	void (*bufferprog)(struct aglctx* ctx);
+	int (*vertexprog)(struct aglctx*);
+	int (*fragmentprog)(struct aglctx*);
 } aglContext;
 
 /* a pixel, used for getpixel/putpixel calls */
@@ -181,6 +186,9 @@ int aglDeleteSampler( aglContext* ctx, aglSampler* smp );
 aglBuffer* aglMakeBuffer( aglContext* ctx, unsigned w, unsigned h,
 	unsigned flags );
 int aglDeleteBuffer( aglContext* ctx, aglBuffer* buf );
+int aglShadeBuffer( aglContext* ctx, aglBuffer* buf,
+	int (*prog)(aglContext*) );
+int aglClearBuffer( aglBuffer* buf, unsigned what );
 
 /* texture sampling functions */
 
