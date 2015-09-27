@@ -60,13 +60,24 @@ Another part of the API deals with texture handling. At first I'll handle just
 2D textures, then move to 3D textures (both cube maps and volume maps). The
 various forms of coordinate wrapping/clamping/whatever and subpixel filtering
 will probably keep me up at night. Note: The process of setting up samplers
-involves some manual handiwork after their creation.
+involves some manual handiwork after their creation. Same as with arrays, the
+data you pass is used directly, not copied.
 
 After all that is out of the way, I'll be moving to the transform programs. A
 transform program is pretty much a function that gets called for each
 primitive at each pass (vertex, fragment, framebuffer), and modifies the
 resulting value(s). Shaders, pretty much, but without being as isolated as in
 other APIs (which can be dangerous...).
+
+The way screen shaders work may seem a bit alien to everyone, but it's easy to
+understand. When you call aglShadeBuffer, the library will go on a loop for
+each pixel inside it, calling whatever you passed as the buffer program.
+
+It's very simple to create samplers from buffers. Just make sure you OR its
+type with SMP_BUF, so the program knows its data is not to be freed at exit,
+since it will be done on buffer deletion anyway. Aditionally, for making
+samplers from the depth and stencil buffers, the D* and S* formats are
+available.
 
 Then, when all the graphics stuff is over, I'll move on to making the other
 libraries of the whole suite. One for vector/matrix math, the other for more
@@ -82,11 +93,11 @@ current messages and their explanations are the following:
 - **Null pointer returned from malloc (out of memory?)**: means what it says, a
   call to malloc() returned a null pointer, this could usually mean you ran
   out of memory, somehow.
-- **Oh gn0! I am teh suck!**: You're passing a nonexistent context to API calls,
-  you doofus.
+- **Oh gn0! I am teh suck!**: You're passing a nonexistent context to API
+  calls, you doofus.
 - **There was an object here, but it's gone now**: Deleting an object that
   doesn't exist, trying to draw a nonexistent array or pushing to an
-  unallocated queue.
+  unallocated queue. Also, accessing null samplers/buffers.
 - **Attempted to start queue with zero size**: You can guess what this means.
 - **No space left in queue to push data**: You're pushing more data than the
   queue can handle. Fix this by setting a big enough capacity and reallocating
@@ -104,18 +115,21 @@ current messages and their explanations are the following:
 - **AGL will now attempt to fit a square peg in a round hole**: You're either
   accessing a 2D sampler with aglTex3D or a 3D sampler with aglTex2D. The
   value returned will be "mostly" correct for each situation, though.
-- **No data has been passed to API call**: This will happen when creating arrays
-  or samplers. It won't prevent the creation of either object, but just let you
-  know that bad things will happen if you do NOT set actual data before using
-  them.
+- **No data has been passed to API call**: This will happen when creating
+  arrays or samplers. It won't prevent the creation of either object, but just
+  let you know that bad things will happen if you do NOT set actual data before
+  using them.
 - **Element has no data to read**: The companion to the previous warning. The
   library is attempting to read from an object with no assigned data. It will
-  default to some predefined fallback value in such a case.
-- **No vertices to see here**: You forgot to set the ARR_VERTICES flag on either
-  the queue or an array. This will easily happen if you're drawing from an
-  uninitialized queue/array.
-- **Function not implemented**: You're using something that isn't done yet. This
-  will show up A LOT before the project is 100% complete.
+  default to some predefined fallback value in such a case. This will also
+  happen when reading from uninitialized samplers.
+- **No vertices to see here**: You forgot to set the ARR_VERTICES flag on
+  either the queue or an array. This will easily happen if you're drawing from
+  an uninitialized queue/array.
+- **No target buffer has been set**: A geometry draw operation cannot be
+  performed if you didn't set the target buffer.
+- **Function not implemented**: You're using something that isn't done yet.
+  This will show up A LOT before the project is 100% complete.
 
 ## Okay whatever... so... is it going to be FOSS?
 

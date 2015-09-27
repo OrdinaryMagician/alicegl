@@ -28,15 +28,26 @@
 #define SMP_FILTER_NEAREST 0x00
 #define SMP_FILTER_LINEAR  0x01
 
-#define SMP_DEPTH_RGB8  0x00
-#define SMP_DEPTH_RGBA8 0x01
-#define SMP_DEPTH_RGBF  0x02
-#define SMP_DEPTH_RGBAF 0x03
+#define SMP_FORMAT_RGB8  0x00
+#define SMP_FORMAT_RGBA8 0x01
+#define SMP_FORMAT_RGBF  0x02
+#define SMP_FORMAT_RGBAF 0x03
+#define SMP_FORMAT_L8    0x04
+#define SMP_FORMAT_LA8   0x05
+#define SMP_FORMAT_LF    0x06
+#define SMP_FORMAT_LAF   0x06
+
+#define SMP_FORMAT_D32 0x40
+#define SMP_FORMAT_DF  0x41
+
+#define SMP_FORMAT_S8  0x80
+#define SMP_FORMAT_S32 0x82
 
 #define SMP_UNSET  0x00
 #define SMP_FLAT   0x01
 #define SMP_CUBE   0x02
 #define SMP_VOLUME 0x03
+#define SMP_BUF    0x80
 
 #define CUBE_PX 0x00
 #define CUBE_NX 0x01
@@ -80,7 +91,7 @@ typedef struct aglsmp
 	struct aglsmp *prev, *next;
 	void *data;
 	unsigned width, height, length;
-	unsigned char depth;
+	unsigned char format;
 	unsigned char coordu, coordv, coordw;
 	unsigned char filter;
 	unsigned char type;
@@ -124,6 +135,8 @@ typedef struct
 	float normal[3];
 	float texcoord[2];
 	float color[4];
+	float bufcoord[2];
+	float bufmetrics[2];
 	float uniform[16];
 } aglProgdata;
 
@@ -144,7 +157,7 @@ typedef struct aglctx
 	aglSampler *samplers;
 	aglArray *arrays;
 	aglBuffer *buffers;
-	aglProgdata pdata;
+	aglProgdata vdata, fdata, bdata;
 	int (*vertexprog)(struct aglctx*);
 	int (*fragmentprog)(struct aglctx*);
 } aglContext;
@@ -196,3 +209,9 @@ int aglTex2D( aglSampler* smp, float u, float v, aglPixel* to );
 int aglTex3D( aglSampler* smp, float u, float v, float w, aglPixel* to );
 int aglGetPixel( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to );
 int aglPutPixel( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from );
+int aglGetColor( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to );
+int aglPutColor( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from );
+int aglGetDepth( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to );
+int aglPutDepth( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from );
+int aglGetStencil( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to );
+int aglPutStencil( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from );

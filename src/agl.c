@@ -23,6 +23,7 @@
 #define M_NODATA    "No data has been passed to API call"
 #define M_NULLREAD  "Element has no data to read"
 #define M_NOVERT    "No vertices to see here"
+#define M_NOBUF     "No target buffer has been set"
 #define M_UNIMP     "Function not implemented"
 
 /* warnings and errors */
@@ -206,7 +207,7 @@ int aglDeleteSampler( aglContext* ctx, aglSampler* smp )
 	if ( smp == ctx->samplers ) ctx->samplers = smp->next;
 	if ( smp->prev ) smp->prev->next = smp->next;
 	if ( smp->next ) smp->next->prev = smp->prev;
-	if ( smp->data ) free(smp->data);
+	if ( smp->data && !smp->type&SMP_BUF ) free(smp->data);
 	free(smp);
 	return 0;
 }
@@ -284,6 +285,42 @@ int aglGetPixel( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to )
 }
 
 int aglPutPixel( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from )
+{
+	(void)buf, (void)x, (void)y, (void)from;
+	return error(M_UNIMP);
+}
+
+int aglGetColor( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to )
+{
+	(void)buf, (void)x, (void)y, (void)to;
+	return error(M_UNIMP);
+}
+
+int aglPutColor( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from )
+{
+	(void)buf, (void)x, (void)y, (void)from;
+	return error(M_UNIMP);
+}
+
+int aglGetDepth( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to )
+{
+	(void)buf, (void)x, (void)y, (void)to;
+	return error(M_UNIMP);
+}
+
+int aglPutDepth( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from )
+{
+	(void)buf, (void)x, (void)y, (void)from;
+	return error(M_UNIMP);
+}
+
+int aglGetStencil( aglBuffer* buf, unsigned x, unsigned y, aglPixel* to )
+{
+	(void)buf, (void)x, (void)y, (void)to;
+	return error(M_UNIMP);
+}
+
+int aglPutStencil( aglBuffer* buf, unsigned x, unsigned y, aglPixel* from )
 {
 	(void)buf, (void)x, (void)y, (void)from;
 	return error(M_UNIMP);

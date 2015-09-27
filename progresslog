@@ -54,6 +54,12 @@ Base project (AliceGL - Graphics Library):
       - aglTex3D
       - aglGetPixel
       - aglPutPixel
+      - aglGetColor
+      - aglPutColor
+      - aglGetDepth
+      - aglPutDepth
+      - aglGetStencil
+      - aglPutStencil
 Math suite (AliceGL - Geometry Library):
   - Start project
   - Vector
