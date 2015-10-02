@@ -85,6 +85,11 @@
 #define BLEND_MOD   0x04
 #define BLEND_ALPHA 0x10
 
+#define RENDER_DISCARD 0x00
+#define RENDER_POINTS  0x01
+#define RENDER_EDGES   0x02
+#define RENDER_FACES   0x03
+
 /* a sampler */
 typedef struct aglsmp
 {
@@ -135,8 +140,6 @@ typedef struct
 	float normal[3];
 	float texcoord[2];
 	float color[4];
-	float bufcoord[2];
-	float bufmetrics[2];
 	float uniform[16];
 } aglProgdata;
 
@@ -145,12 +148,13 @@ typedef struct aglctx
 {
 	aglBuffer *target;
 	aglSampler *activetex[8];
-	float scissor[4];
+	float scissor[4]; /* lowest x, highest x, lowest y, highest y */
 	unsigned char depthtest;
 	unsigned char stenciltest;
 	unsigned char stencilop[3];
 	unsigned char cullface;
 	unsigned char blendmode;
+	unsigned char rendermode;
 	float *queue;
 	unsigned queuesize, queuepos;
 	unsigned char queueflags;
@@ -180,7 +184,7 @@ int aglStartQueue( aglContext* ctx, unsigned siz, unsigned flags );
 int aglPushVertex( aglContext* ctx, float x, float y, float z );
 int aglPushNormal( aglContext* ctx, float x, float y, float z );
 int aglPushCoord( aglContext* ctx, float u, float v );
-int aglPushColor( aglContext* ctx, float r, float g, float b );
+int aglPushColor( aglContext* ctx, float r, float g, float b, float a );
 /* rasterize all the things! */
 int aglDrawQueue( aglContext* ctx );
 /* note that alicegl only knows triangles. no strips, fans, or any others */

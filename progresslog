@@ -10,32 +10,32 @@ Base project (AliceGL - Graphics Library):
   X Figure out how to do this damn thing
   X Base skeleton
   X Context object
-  - Rasterizer
-    - Triangle drawing
-      - Point
+  C Rasterizer
+    C Triangle drawing
+      C Point
       - Line
       - Triangle
       - Interpolation/Smoothing
-      - Culling
+      X Culling
       - Masking
-      - Depth testing
+      C Depth testing
       - Blending
       - Antialiasing
-      - Stencil testing
-    - Transform programs (a.k.a. shaders)
-      - Vertex transform (vertex shader)
+      C Stencil testing
+    P Transform programs (a.k.a. shaders)
+      X Vertex transform (vertex shader)
       - Fragment transform (fragment shader)
       - Buffer transform (screen shader)
-  C API
+  P API
     X Meta
       X aglInit
       X aglQuit
-    C Geometry queue
+    P Geometry queue
       X aglStartQueue
       X aglPushVertex
-      C aglPushNormal
-      C aglPushCoord
-      C aglPushColor
+      X aglPushNormal
+      X aglPushCoord
+      X aglPushColor
       - aglDrawQueue
     P Draw arrays
       - aglMakeArray
@@ -60,6 +60,7 @@ Base project (AliceGL - Graphics Library):
       - aglPutDepth
       - aglGetStencil
       - aglPutStencil
+  - Internal testing and example code
 Math suite (AliceGL - Geometry Library):
   - Start project
   - Vector
@@ -68,6 +69,7 @@ Math suite (AliceGL - Geometry Library):
   - Matrix
     - Basic math
     - Advanced math
+  - Internal testing and example code
 Helper stuff (AliceGL - Game Library):
   - Start project
   - Geometry generator
@@ -83,3 +85,4 @@ Helper stuff (AliceGL - Game Library):
   - Physics helpers
   - Skeletal animation
   - Etc.
+  - Internal testing and example code

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 /* messages */
 
@@ -50,6 +51,116 @@ static void agl_loaded( void )
 static void agl_unloaded( void )
 {
 }
+
+/* BEGIN INTERNAL RASTERIZATION CODE */
+
+typedef struct
+{
+	float position[3];
+	float normal[3];
+	float coord[2];
+	float color[4];
+} vert_t;
+
+static int boundstest( vert_t* v )
+{
+	if ( v->position[0] < 0.0 || v->position[0] >= 1.0 ) return 0;
+	if ( v->position[1] < 0.0 || v->position[1] >= 1.0 ) return 0;
+	if ( v->position[2] < 0.0 || v->position[2] >= 1.0 ) return 0;
+	return 1;
+}
+
+static int culltest( aglContext* ctx, vert_t* t )
+{
+	if ( ctx->cullface == CL_BOTH ) return 0;
+	float avgznormal = (t[0].normal[2]+t[1].normal[2]+t[2].normal[2])/3.0;
+	if ( (ctx->cullface == CL_BACK) && avgznormal >= 0 ) return 0;
+	if ( (ctx->cullface == CL_FRONT) && avgznormal <= 0 ) return 0;
+	return 1;
+}
+
+static int stenciltest( aglContext* ctx, vert_t* v )
+{
+	(void)ctx, (void)v;
+	return 1;
+}
+
+static int depthtest( aglContext* ctx, vert_t* v )
+{
+	(void)ctx, (void)v;
+	return 1;
+}
+
+static void tri_draw( aglContext* ctx, vert_t* inv )
+{
+	vert_t outv[3];
+	/* vertex shading goes here */
+	if ( ctx->vertexprog )
+	{
+		memcpy(&ctx->vdata,&inv[0],sizeof(vert_t));
+		ctx->vertexprog(ctx);
+		memcpy(&outv[0],&ctx->vdata,sizeof(vert_t));
+		memcpy(&ctx->vdata,&inv[1],sizeof(vert_t));
+		ctx->vertexprog(ctx);
+		memcpy(&outv[1],&ctx->vdata,sizeof(vert_t));
+		memcpy(&ctx->vdata,&inv[2],sizeof(vert_t));
+		ctx->vertexprog(ctx);
+		memcpy(&outv[2],&ctx->vdata,sizeof(vert_t));
+	}
+	else
+	{
+		memcpy(&outv[0],&inv[0],sizeof(vert_t));
+		memcpy(&outv[1],&inv[1],sizeof(vert_t));
+		memcpy(&outv[2],&inv[2],sizeof(vert_t));
+	}
+	if ( ctx->rendermode == RENDER_POINTS )
+	{
+		aglPixel px;
+		unsigned ppx, ppy;
+		if ( !culltest(ctx,&outv[0]) ) return;
+		if ( boundstest(&outv[0]) && stenciltest(ctx,&outv[0])
+			&& depthtest(ctx,&outv[0]) )
+		{
+			px.r = outv[0].color[0];
+			px.g = outv[0].color[1];
+			px.b = outv[0].color[2];
+			px.a = outv[0].color[3];
+			ppx = floor(outv[0].position[0]*ctx->target->width);
+			ppy = floor(outv[0].position[1]*ctx->target->height);
+			aglPutColor(ctx->target,ppx,ppy,&px);
+		}
+		if ( boundstest(&outv[1]) && stenciltest(ctx,&outv[1])
+			&& depthtest(ctx,&outv[1]) )
+		{
+			px.r = outv[1].color[0];
+			px.g = outv[1].color[1];
+			px.b = outv[1].color[2];
+			px.a = outv[1].color[3];
+			ppx = floor(outv[1].position[0]*ctx->target->width);
+			ppy = floor(outv[1].position[1]*ctx->target->height);
+			aglPutColor(ctx->target,ppx,ppy,&px);
+		}
+		if ( boundstest(&outv[1]) && stenciltest(ctx,&outv[1])
+			&& depthtest(ctx,&outv[1]) )
+		{
+			px.r = outv[2].color[0];
+			px.g = outv[2].color[1];
+			px.b = outv[2].color[2];
+			px.a = outv[2].color[3];
+			ppx = floor(outv[2].position[0]*ctx->target->width);
+			ppy = floor(outv[2].position[1]*ctx->target->height);
+			aglPutColor(ctx->target,ppx,ppy,&px);
+		}
+	}
+	else if ( ctx->rendermode == RENDER_EDGES )
+	{
+	}
+	else if ( ctx->rendermode == RENDER_FACES )
+	{
+	}
+}
+
+/* END INTERNAL RASTERIZATION CODE */
 
 /* creates a new, zero-filled context object */
 aglContext* aglInit( void )
@@ -138,20 +249,38 @@ int aglPushVertex( aglContext* ctx, float x, float y, float z )
 
 int aglPushNormal( aglContext* ctx, float x, float y, float z )
 {
-	(void)ctx, (void)x, (void)y, (void)z;
-	return error(M_UNIMP);
+	if ( !ctx ) return error(M_NURUPO);
+	if ( !ctx->queue ) return error(M_NOOBJ);
+	if ( !ctx->queueflags&ARR_NORMALS ) return error(M_FLAGPVT);
+	if ( ctx->queuepos+3 < ctx->queuesize ) return error(M_QUEUEFUL);
+	ctx->queue[ctx->queuepos++] = x;
+	ctx->queue[ctx->queuepos++] = y;
+	ctx->queue[ctx->queuepos++] = z;
+	return 0;
 }
 
 int aglPushCoord( aglContext* ctx, float u, float v )
 {
-	(void)ctx, (void)u, (void)v;
-	return error(M_UNIMP);
+	if ( !ctx ) return error(M_NURUPO);
+	if ( !ctx->queue ) return error(M_NOOBJ);
+	if ( !ctx->queueflags&ARR_COORDS ) return error(M_FLAGPVT);
+	if ( ctx->queuepos+2 < ctx->queuesize ) return error(M_QUEUEFUL);
+	ctx->queue[ctx->queuepos++] = u;
+	ctx->queue[ctx->queuepos++] = v;
+	return 0;
 }
 
-int aglPushColor( aglContext* ctx, float r, float g, float b )
+int aglPushColor( aglContext* ctx, float r, float g, float b, float a )
 {
-	(void)ctx, (void)r, (void)g, (void)b;
-	return error(M_UNIMP);
+	if ( !ctx ) return error(M_NURUPO);
+	if ( !ctx->queue ) return error(M_NOOBJ);
+	if ( !ctx->queueflags&ARR_COLORS ) return error(M_FLAGPVT);
+	if ( ctx->queuepos+4 < ctx->queuesize ) return error(M_QUEUEFUL);
+	ctx->queue[ctx->queuepos++] = r;
+	ctx->queue[ctx->queuepos++] = g;
+	ctx->queue[ctx->queuepos++] = b;
+	ctx->queue[ctx->queuepos++] = a;
+	return 0;
 }
 
 int aglDrawQueue( aglContext* ctx )
