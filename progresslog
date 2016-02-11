@@ -10,33 +10,37 @@ Base project (AliceGL - Graphics Library):
   X Figure out how to do this damn thing
   X Base skeleton
   X Context object
-  C Rasterizer
-    C Triangle drawing
-      C Point
+  P Rasterizer
+    P Triangle drawing
+      X Point
       - Line
       - Triangle
       - Interpolation/Smoothing
       X Culling
       - Masking
-      C Depth testing
+      - Depth testing
       - Blending
       - Antialiasing
-      C Stencil testing
+      - Stencil testing
     P Transform programs (a.k.a. shaders)
       X Vertex transform (vertex shader)
       - Fragment transform (fragment shader)
       - Buffer transform (screen shader)
+    - Special 256-colour mode
+      - Paletted textures and buffers
+      - Blending LUTs / colour maps
+      - Mode 13h optimized rendering
   P API
     X Meta
       X aglInit
       X aglQuit
-    P Geometry queue
+    X Geometry queue
       X aglStartQueue
       X aglPushVertex
       X aglPushNormal
       X aglPushCoord
       X aglPushColor
-      - aglDrawQueue
+      X aglDrawQueue
     P Draw arrays
       - aglMakeArray
       - aglDrawArray
@@ -44,11 +48,11 @@ Base project (AliceGL - Graphics Library):
     X Sampler management
       X aglMakeSampler
       X aglDeleteSampler
-    X Buffers
+    C Buffers
       X aglMakeBuffer
       X aglDeleteBuffer
       - aglShadeBuffer
-      - aglClearBuffer
+      C aglClearBuffer
     - Texture utility functions
       - aglTex2D
       - aglTex3D
@@ -79,7 +83,7 @@ Helper stuff (AliceGL - Game Library):
     - Teapot
   - Collision detection
     - Sphere
-    - Triangle
+    - Poly
     - Box
   - Tracers
   - Physics helpers

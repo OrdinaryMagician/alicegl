@@ -83,6 +83,10 @@ Then, when all the graphics stuff is over, I'll move on to making the other
 libraries of the whole suite. One for vector/matrix math, the other for more
 game-specific functionality, like physics and animation.
 
+I'm also planning a sort of "Mode 13h friendly" addition, which will work with
+256-color palettes. Of course, it would completely change how rendering works,
+disabling some features that would be incompatible.
+
 ## These messages, what do they mean?
 
 AliceGL will vomit out messages to stderr every time something goes either
@@ -97,7 +101,8 @@ current messages and their explanations are the following:
   calls, you doofus.
 - **There was an object here, but it's gone now**: Deleting an object that
   doesn't exist, trying to draw a nonexistent array or pushing to an
-  unallocated queue. Also, accessing null samplers/buffers.
+  unallocated queue. Also, accessing null samplers/buffers. Or using 256-color
+  mode without palette data.
 - **Attempted to start queue with zero size**: You can guess what this means.
 - **No space left in queue to push data**: You're pushing more data than the
   queue can handle. Fix this by setting a big enough capacity and reallocating
@@ -125,11 +130,14 @@ current messages and their explanations are the following:
   happen when reading from uninitialized samplers.
 - **No vertices to see here**: You forgot to set the ARR_VERTICES flag on
   either the queue or an array. This will easily happen if you're drawing from
-  an uninitialized queue/array.
+  an uninitialized queue/array. Can also happen if you try to draw a queue
+  or array and the vertex count doesn't add up.
 - **No target buffer has been set**: A geometry draw operation cannot be
   performed if you didn't set the target buffer.
 - **Function not implemented**: You're using something that isn't done yet.
   This will show up A LOT before the project is 100% complete.
+- **No you do not understand**: Incompatible flags have been detected in an
+  object (e.g.: floating point color AND indexed color in a buffer).
 
 ## Okay whatever... so... is it going to be FOSS?
 

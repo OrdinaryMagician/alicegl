@@ -10,6 +10,7 @@
 #define BUF_INTDEPTH   0x08
 #define BUF_USESTENCIL 0x10
 #define BUF_INTSTENCIL 0x20
+#define BUF_256COLOR   0x40
 
 #define CLEAR_COLOR   0x01
 #define CLEAR_DEPTH   0x02
@@ -35,13 +36,16 @@
 #define SMP_FORMAT_L8    0x04
 #define SMP_FORMAT_LA8   0x05
 #define SMP_FORMAT_LF    0x06
-#define SMP_FORMAT_LAF   0x06
+#define SMP_FORMAT_LAF   0x07
 
 #define SMP_FORMAT_D32 0x40
 #define SMP_FORMAT_DF  0x41
 
 #define SMP_FORMAT_S8  0x80
-#define SMP_FORMAT_S32 0x82
+#define SMP_FORMAT_S32 0x81
+
+#define SMP_FORMAT_I8  0xC0
+#define SMP_FORMAT_IA8 0xC1
 
 #define SMP_UNSET  0x00
 #define SMP_FLAT   0x01
@@ -56,14 +60,14 @@
 #define CUBE_PZ 0x04
 #define CUBE_NZ 0x05
 
-#define TEST_NEVER    0x00
-#define TEST_LESS     0x01
-#define TEST_LEQUAL   0x02
-#define TEST_EQUAL    0x03
-#define TEST_GEQUAL   0x04
-#define TEST_GREATER  0x05
-#define TEST_ALWAYS   0x06
-#define TEST_NOTEQUAL 0x07
+#define TEST_NEVER   0x00
+#define TEST_LESS    0x01
+#define TEST_LEQUAL  0x02
+#define TEST_EQUAL   0x03
+#define TEST_GEQUAL  0x04
+#define TEST_GREATER 0x05
+#define TEST_ALWAYS  0x06
+#define TEST_NEQUAL  0x07
 
 #define ST_KEEP 0x00
 #define ST_ZERO 0x01
@@ -78,12 +82,14 @@
 #define CL_FRONT 0x01
 #define CL_BOTH  0x02
 
-#define BLEND_ONE   0x00
-#define BLEND_ADD   0x01
-#define BLEND_MULT  0x02
-#define BLEND_OVER  0x03
-#define BLEND_MOD   0x04
-#define BLEND_ALPHA 0x10
+#define BLEND_NONE  0x00
+#define BLEND_ALPHA 0x01
+#define BLEND_ADD   0x02
+#define BLEND_SUB   0x03
+#define BLEND_MULT  0x04
+#define BLEND_DIV   0x05
+#define BLEND_OVER  0x06
+#define BLEND_MOD   0x07
 
 #define RENDER_DISCARD 0x00
 #define RENDER_POINTS  0x01
@@ -121,7 +127,7 @@ typedef struct aglbuf
 		unsigned char coldepmasks;
 	};
 	unsigned stencilmask;
-	float clearcolor, cleardepth;
+	float clearcolor[4], cleardepth;
 	unsigned clearstencil;
 } aglBuffer;
 /* an array */
@@ -143,6 +149,19 @@ typedef struct
 	float uniform[16];
 } aglProgdata;
 
+/* struct for holding palette mode data */
+typedef struct
+{
+	unsigned char palette[3][256];
+	unsigned char trantab[256][256]; /* alpha */
+	unsigned char addtab[256][256];
+	unsigned char subtab[256][256];
+	unsigned char multab[256][256];
+	unsigned char divtab[256][256];
+	unsigned char overtab[256][256];
+	unsigned char modtab[256][256];
+} aglPaldata;
+
 /* the context, because we don't need global state */
 typedef struct aglctx
 {
@@ -161,6 +180,7 @@ typedef struct aglctx
 	aglSampler *samplers;
 	aglArray *arrays;
 	aglBuffer *buffers;
+	aglPaldata *paldata; /* renderer assumes paletted mode if it exists */
 	aglProgdata vdata, fdata, bdata;
 	int (*vertexprog)(struct aglctx*);
 	int (*fragmentprog)(struct aglctx*);

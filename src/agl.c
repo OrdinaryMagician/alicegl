@@ -26,6 +26,7 @@
 #define M_NOVERT    "No vertices to see here"
 #define M_NOBUF     "No target buffer has been set"
 #define M_UNIMP     "Function not implemented"
+#define M_INCOMPAT  "No you do not understand"
 
 /* warnings and errors */
 #define warn(x) fn_warn(x,__FILE__,__func__,__LINE__)
@@ -240,7 +241,7 @@ int aglPushVertex( aglContext* ctx, float x, float y, float z )
 	if ( !ctx ) return error(M_NURUPO);
 	if ( !ctx->queue ) return error(M_NOOBJ);
 	if ( !ctx->queueflags&ARR_VERTICES ) return error(M_FLAGPVT);
-	if ( ctx->queuepos+3 < ctx->queuesize ) return error(M_QUEUEFUL);
+	if ( ctx->queuepos+3 > ctx->queuesize ) return error(M_QUEUEFUL);
 	ctx->queue[ctx->queuepos++] = x;
 	ctx->queue[ctx->queuepos++] = y;
 	ctx->queue[ctx->queuepos++] = z;
@@ -252,7 +253,7 @@ int aglPushNormal( aglContext* ctx, float x, float y, float z )
 	if ( !ctx ) return error(M_NURUPO);
 	if ( !ctx->queue ) return error(M_NOOBJ);
 	if ( !ctx->queueflags&ARR_NORMALS ) return error(M_FLAGPVT);
-	if ( ctx->queuepos+3 < ctx->queuesize ) return error(M_QUEUEFUL);
+	if ( ctx->queuepos+3 > ctx->queuesize ) return error(M_QUEUEFUL);
 	ctx->queue[ctx->queuepos++] = x;
 	ctx->queue[ctx->queuepos++] = y;
 	ctx->queue[ctx->queuepos++] = z;
@@ -264,7 +265,7 @@ int aglPushCoord( aglContext* ctx, float u, float v )
 	if ( !ctx ) return error(M_NURUPO);
 	if ( !ctx->queue ) return error(M_NOOBJ);
 	if ( !ctx->queueflags&ARR_COORDS ) return error(M_FLAGPVT);
-	if ( ctx->queuepos+2 < ctx->queuesize ) return error(M_QUEUEFUL);
+	if ( ctx->queuepos+2 > ctx->queuesize ) return error(M_QUEUEFUL);
 	ctx->queue[ctx->queuepos++] = u;
 	ctx->queue[ctx->queuepos++] = v;
 	return 0;
@@ -275,7 +276,7 @@ int aglPushColor( aglContext* ctx, float r, float g, float b, float a )
 	if ( !ctx ) return error(M_NURUPO);
 	if ( !ctx->queue ) return error(M_NOOBJ);
 	if ( !ctx->queueflags&ARR_COLORS ) return error(M_FLAGPVT);
-	if ( ctx->queuepos+4 < ctx->queuesize ) return error(M_QUEUEFUL);
+	if ( ctx->queuepos+4 > ctx->queuesize ) return error(M_QUEUEFUL);
 	ctx->queue[ctx->queuepos++] = r;
 	ctx->queue[ctx->queuepos++] = g;
 	ctx->queue[ctx->queuepos++] = b;
@@ -285,8 +286,113 @@ int aglPushColor( aglContext* ctx, float r, float g, float b, float a )
 
 int aglDrawQueue( aglContext* ctx )
 {
-	(void)ctx;
-	return error(M_UNIMP);
+	if ( !ctx ) return error(M_NURUPO);
+	if ( !ctx->queue ) return error(M_NOOBJ);
+	if ( !ctx->queueflags&ARR_VERTICES ) return error(M_NOVERT);
+	int step = 3*(ctx->queueflags&ARR_VERTICES)
+		+3*(ctx->queueflags&ARR_NORMALS)
+		+2*(ctx->queueflags&ARR_COORDS)
+		+4*(ctx->queueflags&ARR_COLORS);
+	int tris = ctx->queuepos/(step*3);
+	int off = ctx->queuepos%(step*3);
+	if ( !tris || off ) return error(M_NOVERT);
+	vert_t tri[3];
+	int i, j;
+	for ( j = 0; j<tris; j++ )
+	{
+		i = 0;
+		tri[0].position[0] = ctx->queue[j*step*3+i++];
+		tri[0].position[1] = ctx->queue[j*step*3+i++];
+		tri[0].position[2] = ctx->queue[j*step*3+i++];
+		if ( ctx->queueflags&ARR_NORMALS )
+		{
+			tri[0].normal[0] = ctx->queue[j*step*3+i++];
+			tri[0].normal[1] = ctx->queue[j*step*3+i++];
+			tri[0].normal[2] = ctx->queue[j*step*3+i++];
+		}
+		else
+		{
+			tri[0].normal[0] = tri[0].normal[1] = 0;
+			tri[0].normal[2] = -1;
+		}
+		if ( ctx->queueflags&ARR_COORDS )
+		{
+			tri[0].coord[0] = ctx->queue[j*step*3+i++];
+			tri[0].coord[1] = ctx->queue[j*step*3+i++];
+		}
+		else tri[0].coord[0] = tri[0].coord[1] = 0;
+		if ( ctx->queueflags&ARR_COLORS )
+		{
+			tri[0].color[0] = ctx->queue[j*step*3+i++];
+			tri[0].color[1] = ctx->queue[j*step*3+i++];
+			tri[0].color[2] = ctx->queue[j*step*3+i++];
+			tri[0].color[3] = ctx->queue[j*step*3+i++];
+		}
+		else tri[0].color[0] = tri[0].color[1] = tri[0].color[2]
+			= tri[0].color[3] = 1;
+		i = 0;
+		tri[1].position[0] = ctx->queue[j*(step*3+1)+i++];
+		tri[1].position[1] = ctx->queue[j*(step*3+1)+i++];
+		tri[1].position[2] = ctx->queue[j*(step*3+1)+i++];
+		if ( ctx->queueflags&ARR_NORMALS )
+		{
+			tri[1].normal[0] = ctx->queue[j*(step*3+1)+i++];
+			tri[1].normal[1] = ctx->queue[j*(step*3+1)+i++];
+			tri[1].normal[2] = ctx->queue[j*(step*3+1)+i++];
+		}
+		else
+		{
+			tri[1].normal[0] = tri[1].normal[1] = 0;
+			tri[1].normal[2] = -1;
+		}
+		if ( ctx->queueflags&ARR_COORDS )
+		{
+			tri[1].coord[0] = ctx->queue[j*(step*3+1)+i++];
+			tri[1].coord[1] = ctx->queue[j*(step*3+1)+i++];
+		}
+		else tri[1].coord[0] = tri[1].coord[1] = 0;
+		if ( ctx->queueflags&ARR_COLORS )
+		{
+			tri[1].color[0] = ctx->queue[j*(step*3+1)+i++];
+			tri[1].color[1] = ctx->queue[j*(step*3+1)+i++];
+			tri[1].color[2] = ctx->queue[j*(step*3+1)+i++];
+			tri[1].color[3] = ctx->queue[j*(step*3+1)+i++];
+		}
+		else tri[1].color[0] = tri[1].color[1] = tri[1].color[2]
+			= tri[1].color[3] = 1;
+		i = 0;
+		tri[2].position[0] = ctx->queue[j*(step*3+2)+i++];
+		tri[2].position[1] = ctx->queue[j*(step*3+2)+i++];
+		tri[2].position[2] = ctx->queue[j*(step*3+2)+i++];
+		if ( ctx->queueflags&ARR_NORMALS )
+		{
+			tri[2].normal[0] = ctx->queue[j*(step*3+2)+i++];
+			tri[2].normal[1] = ctx->queue[j*(step*3+2)+i++];
+			tri[2].normal[2] = ctx->queue[j*(step*3+2)+i++];
+		}
+		else
+		{
+			tri[2].normal[0] = tri[2].normal[1] = 0;
+			tri[2].normal[2] = -1;
+		}
+		if ( ctx->queueflags&ARR_COORDS )
+		{
+			tri[2].coord[0] = ctx->queue[j*(step*3+2)+i++];
+			tri[2].coord[1] = ctx->queue[j*(step*3+2)+i++];
+		}
+		else tri[2].coord[0] = tri[2].coord[1] = 0;
+		if ( ctx->queueflags&ARR_COLORS )
+		{
+			tri[2].color[0] = ctx->queue[j*(step*3+2)+i++];
+			tri[2].color[1] = ctx->queue[j*(step*3+2)+i++];
+			tri[2].color[2] = ctx->queue[j*(step*3+2)+i++];
+			tri[2].color[3] = ctx->queue[j*(step*3+2)+i++];
+		}
+		else tri[2].color[0] = tri[2].color[1] = tri[2].color[2]
+			= tri[2].color[3] = 1;
+		tri_draw(ctx,tri);
+	}
+	return 0;
 }
 
 aglArray* aglMakeArray( aglContext* ctx, unsigned ntris, unsigned flags,
@@ -345,6 +451,8 @@ aglBuffer* aglMakeBuffer( aglContext* ctx, unsigned w, unsigned h,
 	unsigned flags )
 {
 	if ( !ctx ) { error(M_NURUPO); return 0; }
+	if ( !ctx->paldata && flags&BUF_256COLOR )
+	{ error(M_INCOMPAT); return 0; }
 	aglBuffer *buf = malloc(sizeof(aglBuffer));
 	if ( !buf ) { error(M_ALLOCFAIL); return 0; };
 	memset(buf,0,sizeof(aglBuffer));
@@ -352,15 +460,21 @@ aglBuffer* aglMakeBuffer( aglContext* ctx, unsigned w, unsigned h,
 	buf->width = w;
 	buf->height = h;
 	unsigned pxsiz = ((flags&BUF_FLOATCOL)?sizeof(float):sizeof(char))
-		*((flags&BUF_HASALPHA)?4:3);
+		*(((flags&BUF_256COLOR)?1:3)+(flags&BUF_HASALPHA));
 	buf->color = malloc(w*h*pxsiz);
 	if ( !buf->color ) { error(M_ALLOCFAIL); return 0; };
 	pxsiz = (flags&BUF_INTDEPTH)?sizeof(unsigned):sizeof(float);
-	if ( flags&BUF_USEDEPTH ) buf->depth = malloc(w*h*pxsiz);
-	if ( !buf->depth ) { error(M_ALLOCFAIL); return 0; };
+	if ( flags&BUF_USEDEPTH )
+	{
+		buf->depth = malloc(w*h*pxsiz);
+		if ( !buf->depth ) { error(M_ALLOCFAIL); return 0; };
+	}
 	pxsiz = (flags&BUF_INTSTENCIL)?sizeof(unsigned):1;
-	if ( flags&BUF_USESTENCIL ) buf->stencil = malloc(w*h*pxsiz);
-	if ( !buf->stencil ) { error(M_ALLOCFAIL); return 0; };
+	if ( flags&BUF_USESTENCIL )
+	{
+		buf->stencil = malloc(w*h*pxsiz);
+		if ( !buf->stencil ) { error(M_ALLOCFAIL); return 0; };
+	}
 	buf->coldepmasks = -1;
 	buf->stencilmask = -1;
 	aglBuffer *s;
@@ -391,8 +505,20 @@ int aglShadeBuffer( aglContext* ctx, aglBuffer* buf, int (*prog)(aglContext*) )
 
 int aglClearBuffer( aglBuffer* buf, unsigned what )
 {
-	(void)buf, (void)what;
-	return error(M_UNIMP);
+	if ( !buf ) return error(M_NOOBJ);
+	if ( what&CLEAR_COLOR && buf->color )
+	{
+		// TODO
+	}
+	if ( what&CLEAR_DEPTH && buf->depth )
+	{
+		// TODO
+	}
+	if ( what&CLEAR_STENCIL && buf->stencil )
+	{
+		// TODO
+	}
+	return 0;
 }
 
 int aglTex2D( aglSampler* smp, float u, float v, aglPixel* to )
