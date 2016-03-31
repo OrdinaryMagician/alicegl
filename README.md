@@ -49,8 +49,11 @@ data yourself.
 
 Now, the important part, the rasterizer itself. I've been reading up various
 methods of drawing triangles, and I think I'm getting the general idea already.
-Just draw horizontal spans between two edges in a loop, that's it. There seem
-to be various ways of doing this, each with their own advantages/disadvantages.
+
+AliceGL will use the barycentric coord testing method for filling triangles.
+I've been studying this stuff hard, so I know how to do it nicely now. One
+thing that'll probably take me some time is figuring out proper perspective
+correction.
 
 With that out of the way I can easily guess how passing coords, normals and
 whatnot would happen, along with how to do depth testing. I probably won't
@@ -83,7 +86,7 @@ Then, when all the graphics stuff is over, I'll move on to making the other
 libraries of the whole suite. One for vector/matrix math, the other for more
 game-specific functionality, like physics and animation.
 
-I'm also planning a sort of "Mode 13h friendly" addition, which will work with
+I'm also planning a sort of "Mode 13h friendly" version, which will work with
 256-color palettes. Of course, it would completely change how rendering works,
 disabling some features that would be incompatible.
 
